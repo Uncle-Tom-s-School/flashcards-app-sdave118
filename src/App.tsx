@@ -1,34 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react"
+import Cards from "./components/Cards"
+import "./index.css"
+import { fetchCards, type CardData } from "./services/GetCardDatas"
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [cards, setCards] = useState<CardData[]>([])
+  const [currentCardIndex,setCurrentCardIndex] = useState(0)
+
+  useEffect(()=>{
+    fetchCards().then(data => setCards(data))
+    
+  })
+
+  useEffect(()=>{
+    if(currentCardIndex >= cards.length){
+      setCurrentCardIndex(0)
+    }
+  }, [currentCardIndex])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="container">
+      {
+        cards.length === 0 ? <p>FINISHED</p> :
+        <Cards {...cards[currentCardIndex]} onNextCard={() => setCurrentCardIndex(currentCardIndex + 1)} id={currentCardIndex} />
+      }
+      <progress value={currentCardIndex} max={cards.length}></progress>
+      <div style={{color: "white"}}>{currentCardIndex}/{cards.length}</div>
+    </div>
   )
 }
 
